@@ -1,0 +1,21 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Meus Serviços{% endblock %}
+{% block content %}
+<h2>Meus Serviços</h2>
+
+<a href="{% url 'criar_servico' %}" class="btn">+ Novo Serviço</a>
+
+<div class="card">
+    {% for servico in servicos %}
+        <div style="border:1px solid #ccc; padding:10px; margin:10px; border-radius:8px;">
+            <h3>{{ servico.nome }}</h3>
+            <p>{{ servico.descricao }}</p>
+            <p><strong>Preço:</strong> R$ {{ servico.preco }} — <strong>Duração:</strong> {{ servico.duracao }}</p>
+            <a href="{% url 'editar_servico' servico.id %}" class="btn">Editar</a>
+            <a href="{% url 'excluir_servico' servico.id %}" class="btn" style="background:#c0392b;">Excluir</a>
+        </div>
+    {% empty %}
+        <p>Você ainda não cadastrou nenhum serviço.</p>
+    {% endfor %}
+</div>
+{% endblock %}

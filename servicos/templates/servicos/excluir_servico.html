@@ -1,0 +1,11 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Excluir Serviço{% endblock %}
+{% block content %}
+<h2>Excluir Serviço</h2>
+<p>Tem certeza que deseja excluir o serviço <strong>{{ servico.nome }}</strong>?</p>
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn" style="background:#c0392b;">Excluir</button>
+    <a href="{% url 'listar_servicos' %}" class="btn">Cancelar</a>
+</form>
+{% endblock %}

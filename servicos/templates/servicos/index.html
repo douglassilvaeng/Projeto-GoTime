@@ -1,0 +1,60 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Início | Serviços Express{% endblock %}
+
+{% block content %}
+<main>
+    <section class="hero">
+
+        <!-- ===============================
+             ÍCONES ILUSTRATIVOS ANIMADOS
+        ================================ -->
+        <div class="illustration">
+            <!-- Ícone Cliente -->
+            <svg class="icon cliente" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                <circle cx="32" cy="20" r="10" fill="#0078D7"/>
+                <path d="M10 58c0-10 9-18 22-18s22 8 22 18" fill="none" stroke="#0078D7" stroke-width="3"/>
+            </svg>
+
+            <!-- Ícone Profissional -->
+            <svg class="icon profissional" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                <rect x="18" y="10" width="28" height="28" rx="5" ry="5" fill="#005fa3"/>
+                <path d="M10 58l8-14h28l8 14" fill="none" stroke="#005fa3" stroke-width="3"/>
+            </svg>
+        </div>
+
+        <!-- ===============================
+             TEXTO PRINCIPAL
+        ================================ -->
+        <div class="hero-text">
+            <h1>Agende seus serviços de forma simples e rápida!</h1>
+            <p>
+                O <strong>GoTime !</strong> conecta clientes e profissionais,
+                permitindo agendamento online 24h, lembretes automáticos e comunicação direta.
+            </p>
+
+            <!-- ===============================
+                 BOTÕES DE ACESSO
+            ================================ -->
+            <div class="botoes">
+                {% if user.is_authenticated %}
+                    <!-- Se o usuário já estiver logado -->
+                    <a href="{% url 'dashboard_cliente' %}" class="btn">
+                        <i class="fa-solid fa-user"></i> Sou Cliente
+                    </a>
+                    <a href="{% url 'dashboard_profissional' %}" class="btn">
+                        <i class="fa-solid fa-briefcase"></i> Sou Profissional
+                    </a>
+                {% else %}
+                    <!-- Se NÃO estiver logado -->
+                    <a href="{% url 'login' %}?next=/cliente/" class="btn">
+                        <i class="fa-solid fa-user"></i> Sou Cliente
+                    </a>
+                    <a href="{% url 'login' %}?next=/profissional/" class="btn">
+                        <i class="fa-solid fa-briefcase"></i> Sou Profissional
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

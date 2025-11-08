@@ -1,0 +1,18 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Agendar Serviço{% endblock %}
+{% block content %}
+<h2>Agendar Novo Serviço</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label for="servico">Serviço:</label>
+    <input type="text" id="servico" name="servico" required>
+
+    <label for="data">Data:</label>
+    <input type="date" id="data" name="data" required>
+
+    <label for="hora">Hora:</label>
+    <input type="time" id="hora" name="hora" required>
+
+    <button type="submit" class="btn">Confirmar Agendamento</button>
+</form>
+{% endblock %}

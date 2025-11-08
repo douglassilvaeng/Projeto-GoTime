@@ -1,0 +1,275 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Agendar Serviço | Serviços Express{% endblock %}
+{% block content %}
+
+<style>
+/* ======= ESTILO MODERNO DO AGENDAMENTO ======= */
+.agendar-section {
+    background: linear-gradient(180deg, #ffffffcc, #f7f9ff);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px 35px;
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    animation: fadeIn 0.5s ease;
+}
+
+.agendar-section h2 {
+    text-align: center;
+    color: #1b1464;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.agendar-section p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* ======= GRID DE HORÁRIOS ======= */
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.hora-btn {
+    background: #f0f4ff;
+    color: #1b1464;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hora-btn:hover {
+    background: #dbe4ff;
+}
+
+.hora-btn.selected {
+    background: linear-gradient(90deg, #300479, #0096ff);
+    color: #fff;
+}
+
+/* ======= BOTÃO DE CONFIRMAR ======= */
+.btn-confirmar {
+    display: block;
+    width: 100%;
+    background: linear-gradient(90deg, #0096ff, #00c3dc);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-confirmar:hover {
+    opacity: 0.9;
+}
+
+/* ======= ALERTA / FEEDBACK ======= */
+.alerta {
+    text-align: center;
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.alerta.sucesso {
+    color: #0c7c59;
+}
+
+.alerta.erro {
+    color: #c0392b;
+}
+
+/* ======= ANIMAÇÃO ======= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<section class="agendar-section">
+    <h2>📅 Agendar Serviço</h2>
+    <p>Selecione o serviço, o profissional, a data e o horário desejado.</p>
+
+    <form method="POST" id="form-agendar">
+        {% csrf_token %}
+
+        <!-- SERVIÇO -->
+        <div class="form-group mb-3">
+            <label for="servico" class="form-label">Serviço:</label>
+            <select name="servico" id="servico" class="form-control" required>
+                <option value="">-- Escolha o serviço --</option>
+                {% for s in servicos %}
+                    <option value="{{ s.id }}">{{ s.nome }} — R$ {{ s.preco }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- PROFISSIONAL -->
+        <div class="form-group mb-3">
+            <label for="profissional" class="form-label">Profissional:</label>
+            <select name="profissional" id="profissional" class="form-control" required disabled>
+                <option value="">-- Escolha o serviço primeiro --</option>
+            </select>
+        </div>
+
+        <!-- DATA -->
+        <div class="form-group mb-3">
+            <label for="data" class="form-label">Escolha a data:</label>
+            <input type="date" name="data" id="data" class="form-control" required disabled>
+        </div>
+
+        <!-- HORÁRIOS DISPONÍVEIS -->
+        <div class="form-group">
+            <label class="form-label">Horários disponíveis:</label>
+            <div id="horarios" class="horarios-grid">
+                <p style="color:#777;">Selecione o serviço e o profissional para ver os horários.</p>
+            </div>
+        </div>
+
+        <input type="hidden" name="hora" id="hora_escolhida">
+        <button type="submit" class="btn-confirmar"><i class="fa-solid fa-calendar-check"></i> Confirmar Agendamento</button>
+
+        <div id="mensagem" class="alerta"></div>
+    </form>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const servicoSelect = document.getElementById("servico");
+    const profissionalSelect = document.getElementById("profissional");
+    const dataInput = document.getElementById("data");
+    const horariosDiv = document.getElementById("horarios");
+    const horaEscolhidaInput = document.getElementById("hora_escolhida");
+    const mensagem = document.getElementById("mensagem");
+    const form = document.getElementById("form-agendar");
+
+    // 🔹 Quando escolher um serviço → carrega profissionais disponíveis
+    servicoSelect.addEventListener("change", () => {
+        const servicoId = servicoSelect.value;
+        profissionalSelect.innerHTML = "<option>Carregando...</option>";
+        profissionalSelect.disabled = true;
+        dataInput.disabled = true;
+
+        if (servicoId) {
+            fetch(`/buscar_profissionais/?servico=${servicoId}`)
+                .then(res => res.json())
+                .then(data => {
+                    profissionalSelect.innerHTML = '<option value="">-- Escolha o profissional --</option>';
+                    if (data.profissionais && data.profissionais.length > 0) {
+                        data.profissionais.forEach(p => {
+                            const opt = document.createElement("option");
+                            opt.value = p.id;
+                            opt.textContent = p.nome;
+                            profissionalSelect.appendChild(opt);
+                        });
+                        profissionalSelect.disabled = false;
+                    } else {
+                        profissionalSelect.innerHTML = "<option>Nenhum profissional disponível</option>";
+                    }
+                });
+        } else {
+            profissionalSelect.innerHTML = "<option>-- Escolha o serviço primeiro --</option>";
+        }
+    });
+
+    // 🔹 Quando escolher profissional e data → carrega horários
+    function atualizarHorarios() {
+        const profissional = profissionalSelect.value;
+        const data = dataInput.value;
+
+        if (profissional && data) {
+            horariosDiv.innerHTML = "<p style='color:#777;'>Carregando horários...</p>";
+
+            fetch(`/buscar_horarios/?profissional=${profissional}&data=${data}`)
+                .then(res => res.json())
+                .then(data => {
+                    horariosDiv.innerHTML = "";
+
+                    if (data.horarios && data.horarios.length > 0) {
+                        data.horarios.forEach(hora => {
+                            const btn = document.createElement("button");
+                            btn.type = "button";
+                            btn.classList.add("hora-btn");
+                            btn.textContent = hora;
+                            btn.onclick = () => {
+                                document.querySelectorAll(".hora-btn").forEach(b => b.classList.remove("selected"));
+                                btn.classList.add("selected");
+                                horaEscolhidaInput.value = hora;
+                            };
+                            horariosDiv.appendChild(btn);
+                        });
+                    } else {
+                        horariosDiv.innerHTML = "<p style='color:#555;'>Nenhum horário disponível nesta data.</p>";
+                    }
+                })
+                .catch(() => {
+                    horariosDiv.innerHTML = "<p style='color:red;'>Erro ao carregar horários.</p>";
+                });
+        }
+    }
+
+    profissionalSelect.addEventListener("change", () => {
+        dataInput.disabled = false;
+        atualizarHorarios();
+    });
+
+    dataInput.addEventListener("change", atualizarHorarios);
+
+    // 🔹 Confirmar agendamento
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+
+        const servico = servicoSelect.value;
+        const profissional = profissionalSelect.value;
+        const data = dataInput.value;
+        const hora = horaEscolhidaInput.value;
+
+        if (!servico || !profissional || !data || !hora) {
+            mensagem.textContent = "Selecione o serviço, o profissional, a data e o horário.";
+            mensagem.className = "alerta erro";
+            return;
+        }
+
+        mensagem.textContent = "Agendando...";
+        mensagem.className = "alerta";
+
+        fetch(form.action || window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({ servico, profissional, data, hora })
+        })
+        .then(res => {
+            if (res.ok) {
+                mensagem.textContent = "✅ Agendamento confirmado com sucesso!";
+                mensagem.className = "alerta sucesso";
+                form.reset();
+                horariosDiv.innerHTML = "<p style='color:#777;'>Selecione novamente para novo agendamento.</p>";
+            } else {
+                mensagem.textContent = "❌ Erro ao confirmar agendamento.";
+                mensagem.className = "alerta erro";
+            }
+        })
+        .catch(() => {
+            mensagem.textContent = "❌ Falha na conexão com o servidor.";
+            mensagem.className = "alerta erro";
+        });
+    });
+});
+</script>
+
+{% endblock %}

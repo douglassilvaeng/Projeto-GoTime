@@ -1,0 +1,11 @@
+{% extends 'servicos/base.html' %}
+{% block title %}{{ servico.nome|default:"Novo Serviço" }}{% endblock %}
+{% block content %}
+<h2>{{ servico.nome|default:"Cadastrar Novo Serviço" }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Salvar</button>
+</form>
+{% endblock %}

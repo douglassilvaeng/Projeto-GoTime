@@ -1,0 +1,13 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Excluir Horário{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:auto;text-align:center;">
+    <h3>⚠️ Confirmar exclusão</h3>
+    <p>Deseja realmente excluir o horário de <b>{{ horario.data }}</b> às <b>{{ horario.hora }}</b>?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Excluir</button>
+        <a href="{% url 'agenda_profissional' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

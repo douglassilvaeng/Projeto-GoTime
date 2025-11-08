@@ -1,0 +1,23 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Editar Agendamento{% endblock %}
+
+{% block content %}
+<section class="form-section">
+  <h2>Editar Agendamento</h2>
+  <form method="POST">
+    {% csrf_token %}
+    <label for="data">Nova Data:</label>
+    <input type="date" name="data" required>
+
+    <label for="hora">Novo Horário:</label>
+    <select name="hora" required>
+      {% for h in horarios %}
+        <option value="{{ h.hora }}">{{ h.data }} - {{ h.hora }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    <a href="{% url 'dashboard_profissional' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Editar Horário{% endblock %}
+{% block content %}
+<div class="card" style="max-width:500px;margin:auto;">
+    <h3>✏️ Editar Horário</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <label>Data:</label>
+        <input type="date" name="data" value="{{ horario.data|date:'Y-m-d' }}" required>
+        <label>Hora:</label>
+        <input type="time" name="hora" value="{{ horario.hora }}" required>
+        <br><br>
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="{% url 'agenda_profissional' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

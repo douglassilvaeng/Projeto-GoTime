@@ -1,0 +1,138 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Painel do Cliente | Serviços Express{% endblock %}
+{% block content %}
+
+<section class="dashboard-section">
+    <h2>👋 Bem-vindo, {{ user.username|title }}</h2>
+    <p>Veja abaixo seus próximos agendamentos:</p>
+
+    <div class="agendamentos-container">
+        {% if agendamentos %}
+            {% for agendamento in agendamentos %}
+                <div class="agendamento-card">
+                    <h4>{{ agendamento.servico.nome }}</h4>
+                    <p><strong>Profissional:</strong> {{ agendamento.profissional.username }}</p>
+                    <p><strong>Data:</strong> {{ agendamento.horario.data }}</p>
+                    <p><strong>Hora:</strong> {{ agendamento.horario.hora }}</p>
+
+                    <div class="acoes-agendamento">
+                        <a href="{% url 'cancelar_agendamento' agendamento.id %}" class="btn-mini btn-cancelar">
+                            <i class="fa-solid fa-xmark"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="sem-agendamentos">Você ainda não possui agendamentos.</p>
+        {% endif %}
+    </div>
+
+    <div class="botoes">
+        <a href="{% url 'agendar_servico' %}" class="btn-agendar">
+            <i class="fa-solid fa-plus"></i> Agendar Novo Serviço
+        </a>
+    </div>
+</section>
+
+<style>
+.dashboard-section {
+    background: linear-gradient(180deg, #ffffff, #f5f9ff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px 40px;
+    width: 90%;
+    max-width: 800px;
+    margin: 30px auto;
+    animation: fadeIn 0.4s ease;
+}
+
+.dashboard-section h2 {
+    color: #1b1464;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.dashboard-section p {
+    color: #555;
+}
+
+.agendamentos-container {
+    margin-top: 20px;
+}
+
+.agendamento-card {
+    background: linear-gradient(90deg, #f4f8ff, #e9f1ff);
+    border-left: 5px solid #0096ff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.agendamento-card h4 {
+    margin: 0 0 5px;
+    color: #1b1464;
+}
+
+.agendamento-card p {
+    margin: 3px 0;
+    color: #444;
+}
+
+.acoes-agendamento {
+    text-align: right;
+    margin-top: 8px;
+}
+
+.btn-mini {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-cancelar {
+    background: linear-gradient(90deg, #d90429, #ef233c);
+}
+
+.btn-mini:hover {
+    opacity: 0.9;
+}
+
+.sem-agendamentos {
+    color: #666;
+    text-align: center;
+    margin: 30px 0;
+}
+
+.botoes {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.btn-agendar {
+    display: inline-block;
+    background: linear-gradient(90deg, #0096ff, #00c3dc);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-agendar:hover {
+    opacity: 0.9;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+{% endblock %}

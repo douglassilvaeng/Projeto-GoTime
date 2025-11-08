@@ -1,0 +1,165 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Agenda do Profissional | Serviços Express{% endblock %}
+{% block content %}
+
+<!-- FILTRO DE PERÍODO -->
+<div class="filtro-periodo">
+    <form method="get" action="{% url 'filtrar_horarios' %}">
+        <label>📅 De:</label>
+        <input type="date" name="inicio" value="{{ data_inicio|default_if_none:'' }}">
+        <label>Até:</label>
+        <input type="date" name="fim" value="{{ data_fim|default_if_none:'' }}">
+        <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+        <a href="{% url 'agenda_profissional' %}" class="btn btn-sm btn-secondary">Limpar</a>
+    </form>
+</div>
+
+<style>
+.filtro-periodo {
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.filtro-periodo label {
+    font-weight: 600;
+    color: #1b1464;
+}
+.filtro-periodo input[type=date] {
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.filtro-periodo .btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+</style>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<section class="agenda-section">
+    <h2>🗓️ Agenda de {{ user.username|title }}</h2>
+    <p>Visualize seus horários disponíveis e agendamentos confirmados.</p>
+
+    <div class="agenda-container">
+        <!-- COLUNA 1: Agendamentos Confirmados -->
+        <div class="coluna">
+            <h3>✅ Agendamentos Confirmados</h3>
+            {% if agendamentos %}
+                {% for ag in agendamentos %}
+                    <div class="ag-card">
+                        <p><strong>{{ ag.servico.nome }}</strong></p>
+                        <p>👤 {{ ag.cliente.username }}</p>
+                        <p>📅 {{ ag.horario.data }} — {{ ag.horario.hora }}</p>
+                        <a href="{% url 'cancelar_agendamento' ag.id %}" class="btn-mini btn-cancelar">Cancelar</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="sem">Nenhum agendamento confirmado.</p>
+            {% endif %}
+        </div>
+
+        <!-- COLUNA 2: Horários Disponíveis -->
+        <div class="coluna">
+            <div style="text-align:right; margin-bottom:15px;">
+                <a href="{% url 'cadastrar_horario' %}" class="btn btn-sm btn-success">
+                    <i class="fa-solid fa-plus"></i> Adicionar Horário
+                </a>
+            </div>
+
+            <h3>🕒 Horários Disponíveis</h3>
+            {% if horarios_disponiveis %}
+                {% for h in horarios_disponiveis %}
+                    <div class="horario-card">
+                        <p><strong>Serviço:</strong> {{ h.servico.nome }}</p>
+                        <p>📅 {{ h.data }} — {{ h.hora }}</p>
+                        <div class="acoes">
+                            <a href="{% url 'editar_horario' h.id %}" class="btn-mini btn-editar">
+                                <i class="fa-solid fa-pen"></i> Editar
+                            </a>
+                            <a href="{% url 'excluir_horario' h.id %}" class="btn-mini btn-excluir">
+                                <i class="fa-solid fa-trash"></i> Excluir
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="sem-horarios">Nenhum horário livre cadastrado.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ESTILOS -->
+<style>
+.agenda-section {
+    background: linear-gradient(180deg, #ffffff, #f5f9ff);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 30px;
+    max-width: 950px;
+    margin: 40px auto;
+    animation: fadeIn 0.4s ease;
+}
+.agenda-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+.coluna {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+h3 {
+    color: #1b1464;
+    margin-bottom: 15px;
+}
+.ag-card, .horario-card {
+    background: linear-gradient(90deg, #f0f7ff, #e3efff);
+    border-left: 5px solid #0096ff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease;
+}
+.ag-card:hover, .horario-card:hover {
+    transform: scale(1.02);
+}
+.btn-mini {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.btn-editar {
+    background: linear-gradient(90deg, #007bff, #00b4d8);
+}
+.btn-excluir, .btn-cancelar {
+    background: linear-gradient(90deg, #d90429, #ef233c);
+}
+.sem, .sem-horarios {
+    color: #777;
+    text-align: center;
+    font-style: italic;
+}
+.acoes {
+    text-align: right;
+    margin-top: 5px;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+{% endblock %}

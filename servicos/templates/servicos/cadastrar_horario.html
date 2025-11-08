@@ -1,0 +1,153 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Cadastrar Horários | Serviços Express{% endblock %}
+{% block content %}
+
+<style>
+/* ======= ESTILO MODERNO DO CALENDÁRIO ======= */
+.cadastro-section {
+    background: linear-gradient(180deg, #ffffffcc, #f7f9ff);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px 35px;
+    width: 90%;
+    max-width: 700px;
+    margin: 40px auto;
+    animation: fadeIn 0.5s ease;
+}
+
+.cadastro-section h2 {
+    text-align: center;
+    color: #1b1464;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.cadastro-section p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* ======= GRID DE HORÁRIOS ======= */
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.hora-btn {
+    background: #f0f4ff;
+    color: #1b1464;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hora-btn:hover {
+    background: #dbe4ff;
+}
+
+.hora-btn.selected {
+    background: linear-gradient(90deg, #300479, #0096ff);
+    color: #fff;
+}
+
+/* ======= BOTÃO DE SALVAR ======= */
+.btn-salvar {
+    display: block;
+    width: 100%;
+    background: linear-gradient(90deg, #0096ff, #00c3dc);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-salvar:hover {
+    opacity: 0.9;
+}
+
+/* ======= ANIMAÇÃO ======= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<section class="cadastro-section">
+    <h2>📅 Cadastrar Disponibilidade</h2>
+    <p>Escolha uma data e marque os horários que deseja disponibilizar.</p>
+
+    <form method="POST" id="form-horario">
+        {% csrf_token %}
+
+        <div class="form-group mb-3">
+    <label for="servico" class="form-label">Selecione o serviço:</label>
+    <select name="servico" id="servico" class="form-control" required>
+        <option value="">-- Escolha um serviço --</option>
+        {% for s in servicos %}
+            <option value="{{ s.id }}">{{ s.nome }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+
+        <div class="form-group mb-3">
+            <label for="data" class="form-label">Selecione a data:</label>
+            <input type="date" name="data" id="data" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Selecione os horários disponíveis:</label>
+            <div class="horarios-grid">
+                {% for hora in horas %}
+                    <button type="button" class="hora-btn" data-hora="{{ hora }}:00">{{ hora }}:00</button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <input type="hidden" name="horarios_selecionados" id="horarios_selecionados">
+        <button type="submit" class="btn-salvar"><i class="fa-solid fa-floppy-disk"></i> Salvar Horários</button>
+    </form>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const horaBtns = document.querySelectorAll(".hora-btn");
+    const inputHidden = document.getElementById("horarios_selecionados");
+
+    horaBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            btn.classList.toggle("selected");
+
+            const selecionadas = [...document.querySelectorAll(".hora-btn.selected")]
+                .map(b => b.dataset.hora);
+            inputHidden.value = selecionadas.join(",");
+        });
+    });
+
+    document.getElementById("form-horario").addEventListener("submit", e => {
+        const data = document.getElementById("data").value;
+        if (!data) {
+            e.preventDefault();
+            alert("Por favor, escolha uma data.");
+            return;
+        }
+        if (!inputHidden.value) {
+            e.preventDefault();
+            alert("Selecione ao menos um horário!");
+        }
+    });
+});
+</script>
+
+{% endblock %}

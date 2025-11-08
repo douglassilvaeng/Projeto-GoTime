@@ -1,0 +1,28 @@
+{% extends 'servicos/base.html' %}
+{% block title %}Cadastrar Serviço | Serviços Express{% endblock %}
+
+{% block content %}
+<section class="cadastro-section">
+    <h2>Cadastrar Novo Serviço</h2>
+    <p class="descricao">Informe os detalhes do serviço que você oferece</p>
+
+    <form method="POST" class="cadastro-form">
+        {% csrf_token %}
+        <div class="form-grid">
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <small class="error">{{ field.errors|join:", " }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn"><i class="fa-solid fa-plus"></i> Salvar Serviço</button>
+    </form>
+
+    <a href="{% url 'listar_servicos' %}" class="btn-voltar">← Voltar à Lista</a>
+</section>
+{% endblock %}
